@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication,QFileDialog,Q
 
 cfilename = ''
 mfilename = ''
-class Example(QMainWindow):
+class Inteface(QMainWindow):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -57,7 +57,7 @@ class Example(QMainWindow):
             Messag.mesdecoder(mfilename, cfilename)
             self.slbl.setText('Decoded')
 
-class Messag(Example):  
+class Messag(Inteface):  
     def __init__(self):
          super().__init__()
          self.fread()
@@ -137,7 +137,7 @@ class Messag(Example):
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
-    ex = Example()
+    ex = Inteface()
     sys.exit(app.exec_())
 
 
