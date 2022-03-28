@@ -8,7 +8,7 @@ import uuid
 import re
 import sys
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QApplication,QFileDialog,QLabel
-
+#UI module
 cfilename = ''
 mfilename = ''
 class Inteface(QMainWindow):
@@ -56,7 +56,7 @@ class Inteface(QMainWindow):
         elif sender.text() == "decoder":
             Messag.mesdecoder(mfilename, cfilename)
             self.slbl.setText('Decoded')
-
+#Coding_message_module
 class Messag(Inteface):  
     def __init__(self):
          super().__init__()
@@ -66,7 +66,7 @@ class Messag(Inteface):
         targetreadfile = mfilename
         targetwritefile = cfilename
         textfile = Messag.fread(targetreadfile)
-        hashi = bin(int.from_bytes(textfile.encode('utf-8'), 'big'))[2:]
+        hashi =  Messag.hashicode(textfile)
         keysum = Messag.keysumcode(hashi)
         mackey = Messag.maccode()
         record = (mackey + hashi + keysum)
@@ -86,48 +86,59 @@ class Messag(Inteface):
             Messag.fwrite(targetwritefile, decodemassege)    
         else: 
             print('WARNING!!!File not full or was changed')
-
+ #Read_from_file
     def fread(targetfile):
         with open(targetfile) as f:
              repfiletxt = (f.readlines())
              textfile = str(repfiletxt)
              f.close
              return textfile
+ #Write_to_file
     def fwrite(targetfile, record):
         with open(targetfile, "w") as f:
                 f.write(record)
                 f.close()   
+#MAC_addres_coding
     def maccode():
         mac = (''.join(re.findall('..', '%012x' % uuid.getnode())))
         macbin = bin(int.from_bytes(mac.encode('utf-8'), 'big'))[2:]
         mackey = '1' + macbin.zfill(99)
         return mackey
+#Keysum_coding
     def keysumcode(hashi):
         hashiconsum = bin((list(hashi)).count('1'))[2:]
         keysum=hashiconsum.zfill(20)
         return keysum
+#Body_massege_coding
+    def hashicode(textfile)
+        hashi = bin(int.from_bytes(textfile.encode('utf-8'), 'big'))[2:]  
+        return hashi
+#Cutfile
     def textfileclean(textfile):
         textfile = (textfile.replace('[', '').replace(']', '').replace("'", ''))
         return textfile
+#MAC_addr_decoding
     def macdecode(textfile):
         mackeybin = textfile[1:100]
         mackey = (int(str(mackeybin), 2))
         mack = mackey.to_bytes((mackey.bit_length() + 7) // 8, 'big').decode()
         mac = mack[:2] + ':' + mack[2:4] + ':' + mack[4:6] + ':' + mack[6:8] + ':' + mack[8:10] + ':' + mack[10:]
         return mac
-
+#Keysum_decoding
     def keysumdecode(textfile):
         messagelen = len(textfile)
         keysum = (int(str(textfile[(messagelen - 20) : messagelen]), 2))
         return keysum
+#Cutfile
     def textfilecut(textfile):
         messagelen = (len(textfile))
         textfile = str(textfile[100 : messagelen - 20])
         textfile = '0b' + textfile
         return textfile
-
+#Keysum_val
     def checksumkey(textfile, keysum):
         return(textfile.count('1') == keysum)
+#Decode_budy
     def textfiledecode(textfile):
         messagebin = int(textfile, 2)
         message = messagebin.to_bytes((messagebin.bit_length() + 7) // 8, 'big').decode()
