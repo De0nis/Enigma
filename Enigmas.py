@@ -4,7 +4,6 @@ This program encodes messages for transmission in an open way.the checksum and t
 are used. you need to create a document with a message and a document for encoding 2 files .txt
 PyQt5 need
 """
-
 import uuid
 import re
 import sys
